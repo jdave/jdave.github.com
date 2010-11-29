@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+<meta name="Description" content="Behavior-Driving Your Apache Wicket Application: Making the Most of Webdriver and JDave-Wicket" />
+<meta name="Keywords" content="bdd, behaviour driven development, behavior driven development, tdd, test driven design, wicket, apache wicket" />
+<meta name="Copyright" content="Christina Chun" />
+<meta name="Designed By" content="ChristinaChun.com" />
+<meta name="Language" content="English" />
+<title>Behavior-Driving Your Apache Wicket Application: Making the Most of Webdriver and JDave-Wicket</title>
+
+<style type="text/css" title="layout" media="screen"> @import url("gg.css"); </style>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+_uacct = "UA-832056-1";
+_udn="none";
+_ulink=1; 
+urchinTracker();
+</script>
+</head>
+
+<body>
+<div id="container">
+	<div id="header"><div class="headerText">BDD Wicket with JDave</div>
+	<div class="center"><b class="menu"><a href="index.html">Training Material Home</a> | 
+	<a href="http://www.jdave.org/">JDave home</a>
+	<!--<a href="examples.html">Examples</a> | <a href="usage.html">Usage</a> | 
+	<a href="documentation.html">Documentation</a> |
+	<a href="modules.html">Modules</a> |
+	<a href="screenshots.html">Screenshots</a> |
+	<a href="resources.html">Resources</a> -->
+	</b></div>
+	</div>
+		<div id="content">
+			<div id="bodytext">
+		<h1 class="title">Behavior-Driving Your Apache Wicket Application</h1>
+		<h3 class="title">Making the Most of WebDriver and JDave-Wicket</h3>
+		<!--<div class="imageobject"></div>-->
+ <p>This material is meant for supplementing the "Behavior-Driving Your <a href="http://wicket.apache.org/" rel="nofollow">Apache Wicket</a> Application" training <a href="http://www.eu.apachecon.com/c/aceu2009/sessions/214" rel="nofollow">session</a> on Tuesday, 24 March at the <a href="http://www.eu.apachecon.com/c/aceu2009/" rel="nofollow">ApacheCon EU 2009</a> conference in Amsterdam. If you are interested in the theme but cannot make it to the training, you might still find this site useful.</p>
+
+<h3 class="title">Getting Started</h3>
+
+<p>If you are coming to the training, please do at least the following to get started:</p>
+
+<p>0) Install </p>
+<ul class="alternate">
+	<li><a href="http://java.sun.com/javase/downloads/" rel="nofollow">Java</a> (at least 1.6)</li>
+	<li><a href="http://maven.apache.org/download.html" rel="nofollow">Maven 2</a> (at least 2.0.9)</li>
+
+	<li><a href="http://www.mozilla.com/en-US/firefox/all-older.html" rel="nofollow">Firefox 2</a> (Firefox 3 might work as well, Firefox 3.1 beta might work better than 3.0.x)</li>
+	<li><a href="http://subversion.tigris.org/getting.html" rel="nofollow">Subversion</a> (at least 1.5)</li>
+	<li>The IDE you use for Java development, preferably Eclipse or IntelliJ IDEA (we don't know Netbeans!)</li>
+</ul>
+
+
+<p>1) Checkout the latest project code from </p>
+
+<p>  <a href="http://www.laughingpanda.org/svn/kansanpankki/trunk" rel="nofollow">http://www.laughingpanda.org/svn/kansanpankki/trunk</a></p>
+
+<p>(for example </p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">svn co http:<span class="code-comment">//www.laughingpanda.org/svn/kansanpankki/trunk kansanpankki</span></pre>
+</div></div>
+<p>)</p>
+
+<p>2) build the project with Maven to get the necessary dependencies and their source code</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">cd kansanpankki
+  mvn eclipse:eclipse
+  mvn clean install</pre>
+</div></div>
+
+<p>3) If you have a problem with the build, please try to resolve it before the training. </p>
+
+<p>4) Checkout the <a href="http://svn.laughingpanda.org/svn/kansanpankki/tags/">different tags</a> 
+  to get the base situations for different exercices.</p>
+<p>(for example </p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">svn co http:<span class="code-comment">//www.laughingpanda.org/svn/kansanpankki/tags bdd-exercises</span></pre>
+</div></div>
+<p>)</p>
+
+<p>You can start the software by running the main method 
+from a class called <code>Jetty</code>. 
+The WebDriver specs use a different 
+port, so they shouldn't conflict with that. If you use <a href="http://www.zeroturnaround.com/javarebel/" title="JavaRebel is a plugin for the Java Virtual Machine that enables on-the-fly reloading of changes made to Java class files.">JavaRebel</a> 
+and want to run the WebDriver specs faster, you can start <code>WebDriverJettyStarter</code>
+with JavaRebel and then the WebDriver specs should use it.</p>
+
+<p>The Firefox binary used by WebDriver can be chosen by supplying a value for the <code>webdriver.firefox.bin</code> system property, 
+for example <code>-Dwebdriver.firefox.bin=firefox-2</code>. At least on MacOS, the property value should not contain spaces.</p>
+
+ <h3 class="title"><a name="Introduction-BehaviorDrivenDevelopmentwithJDave"></a>Behavior-Driven Development with JDave</h3>
+
+<p>Behavior-Driven Development (BDD) is a way of programming that developed out of Test-Driven Development (TDD). Technically the two are very similar, and many even consider BDD being "TDD done right". This is reflected in the fact that the paper <a href="http://techblog.daveastels.com/2005/07/05/a-new-look-at-test-driven-development/" rel="nofollow">"A New Look at Test-Driven Development"</a> by Dave Astels in 2005 can be seen to mark the birth of BDD. </p>
+
+<p>With TDD, it's possible to write tests in a very whitebox testing way that exposes the internals of the tested classes. This is considered bad practice, and the tests should instead reflect the expected behavior of the objects in certain states and interacting with other objects in certain ways.</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Empty account
+- has balance of 0
+- cannot move money to another account
+- can receive money from another account
+
+Account with money
+- can move money to another account</pre>
+</div></div>
+
+<p>=&gt;</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">public</span> class AccountTest {
+    @Test <span class="code-keyword">public</span> void emptyAccountHasBalanceOf0 { ... }
+    @Test <span class="code-keyword">public</span> void emptyAccountCannotMoveMoneyToAnotherAccount { ... }
+    @Test <span class="code-keyword">public</span> void emptyAccountCanReceiveMoneyFromAnotherAccount { ... }
+    @Test <span class="code-keyword">public</span> void accountWithMoneyCanMoveMoneyToAnotherAccount { ... }
+}</pre>
+
+</div></div>
+
+<p>=&gt; </p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">public</span> class AccountSpec <span class="code-keyword">extends</span> Specification&lt;Account&gt; {
+    <span class="code-keyword">public</span> class EmptyAccount {
+        <span class="code-keyword">public</span> Account create() { <span class="code-keyword">return</span> <span class="code-keyword">new</span> Account(0); }
+        <span class="code-keyword">public</span> void hasBalanceOf0 { ... }
+        <span class="code-keyword">public</span> void cannotMoveMoneyToAnotherAccount { ... }
+        <span class="code-keyword">public</span> void canReceiveMoneyFromAnotherAccount { ... }
+    }
+
+    <span class="code-keyword">public</span> class AccountWithMoney {
+        <span class="code-keyword">public</span> Account create() { <span class="code-keyword">return</span> <span class="code-keyword">new</span> Account(9500); }
+        <span class="code-keyword">public</span> void canMoveMoneyToAnotherAccount { ... }
+    }
+}</pre>
+
+</div></div>
+
+
+<p>The BDD "tests" tend to be called specifications (or specs). On one hand, plain text scenarios (in BDD tools such as RSpec or JBehave) or names (in BDD tools such as JDave) intend to contain textual specification. On other hand, the code executed in the "test methods" tries to convey the essential examples of the usage of the object that demonstrate that the specification is fulfilled. So BDD can also be seen as specifying by examples. (See <a href="http://www.exampler.com/old-blog/2006/04/12/#spec-vs-example">Marick</a> for a discussion between examples and specifications.)</p>
+
+<p><a href="http://www.jdave.org/">JDave</a> is a Java BDD framework that has been around for a couple of years. Its central ideas are the following.</p>
+
+<p>1. There is normally one specification class, extending <tt>jdave.Specification</tt>, per specified class.</p>
+
+<p>2. The specification subclass contains inner classes called contexts. There is a separate context for each interesting state that the specified (tested) object may have.</p>
+
+<p>3. Each public method of a context class is a behavior, whose name indicates an expected behavior of the context, and whose implementation enforces the behavior with relevant examples. Remember that a context is the object under test in a certain state, so the behaviors of a context reflect the expected behavior of the object in that state.</p>
+
+<p>4. JDave provides a JUnit 4 runner, so that JDave specs can be executed with any tool that can execute JUnit tests (such as Maven, Eclipse, IntelliJ IDEA or Buildr).</p>
+
+<p>JDave provides a couple of modules that facilitate writing specs for some specific technologies. In this training, we'll cover jdave-wicket for writing unit test style specifications for Wicket components, and jdave-wicket-webdriver for writing black box functional test style tests for (Ajax) Wicket applications, employing the WebDriver functional testing tool for commanding a Firefox browser to use the application.</p>
+
+
+
+<h3><a name="Introduction-WebDriver"></a>WebDriver</h3>
+
+<p><a href="http://code.google.com/p/webdriver/">WebDriver</a> is a tool for automating functional tests of web applications. It is similar to Selenium and <a href="http://code.google.com/p/webdriver/wiki/FrequentlyAskedQuestions" rel="nofollow">seems like it will be incorporated into Selenium at some point</a>.</p>
+
+<p>With WebDriver, the developer writes Java code to command the browser and inspect the produced HTML. WebDriver takes care of most of the details. In the case of Firefox, it installs a new profile and then the functionality it needs as a Firefox plugin. </p>
+
+<p>The added value that jdave-wicket-webdriver provides is </p>
+
+<p>1. A simple object-oriented model for writing the WebDriver specifications</p>
+
+<p>2. An integrated mechanism for waiting for Wicket Ajax requests to complete</p>
+
+<p>3. Some common mechanisms for initialising the Firefox driver of WebDriver and other plumbing that must be done by any specification</p>
+
+<p>With the programming model of jdave-wicket-webdriver, it is possible to encapsulate the WebDriver-specific details in reusable objects called elements. By naming the element classes and their methods well, they can be grown to resemble a domain-specific language (DSL) about the user interface of the application under test. This way, the specification code using the elements becomes very expressive.</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">ItemsListElement itemsList = searchElement.searchFor(<span class="code-quote">"mp3 player"</span>);
+specify(itemsList.countItems(), does.equal(19));
+specify(itemsList.nameOfElement(1), is(<span class="code-quote">"Pop blaster"</span>));
+specify(itemsList.nameOfElement(2), is(<span class="code-quote">"Frank's TurboPlayer 2000"</span>));</pre>
+</div></div>
+
+<p>The jdave-wicket-webdriver element concept is similar to the <span class="error">&#91;page objects of WebDriver|see http://code.google.com/p/webdriver/wiki/PageObjects&#93;</span>.</p>
+
+<p>In our experience, WebDriver has worked best when</p>
+<ul class="alternate">
+	<li>using snapshots</li>
+	<li>using FireFox 2</li>
+	<li>using Linux (or Windows)</li>
+</ul>
+
+
+<h3 class="title">Outline of the Session Schedule</h3>
+
+
+            <p>This session is a full-day training which means that it consists of two three-hour sessions with lunch in between.</p>
+
+
+<h5><a name="Outline-Morning10.0013.00"></a>Morning 10.00-13.00</h5>
+<ul>
+	<li>general presentation of BDD / JDave and the demo application 10-10.15</li>
+
+	<li>checking the dev environments of people 10.15-10.30</li>
+	<li>a demo on JDave 10.30-10.45</li>
+	<li>1st exercice: an easy JDave task 10.45-11.15
+	<ul>
+		<li>some domain logic driving on JDave</li>
+		<li>Account.java</li>
+	</ul>
+
+	</li>
+	<li>feedback on exercise 11.15-11.30</li>
+	<li>break 11.30-11.45</li>
+	<li>2nd exercise: a more difficult jdave-wicket task 11.45-12.45
+	<ul>
+		<li>implementing new Wicket features</li>
+		<li>seeing the current balance of each account in the list</li>
+		<li>making a transaction and seeing its effects on account balances</li>
+
+	</ul>
+	</li>
+	<li>feedback on exercise 12.45-13.00</li>
+</ul>
+
+
+
+<h5><a name="Outline-Afternoon14.0017.30"></a>Afternoon 14.30 &#8211; 17.30</h5>
+<ul>
+	<li>general presentation of WebDriver and jdave-wicket-webdriver (Elements) 14.30-14.45</li>
+
+	<li>a demo on jdave-wicket-webdriver 14.45-15.00</li>
+	<li>3rd exercise: an easy WebDriver task 15.00-15.30
+	<ul>
+		<li>testing the transfer between two own accounts with WebDriver</li>
+	</ul>
+	</li>
+	<li>feedback on exercise 15.30-15.45</li>
+	<li>break 15.45-16.00</li>
+
+	<li>4th exercice: a more difficult WebDriver task 16.00-17.15
+	<ul>
+		<li>implementing the listing of transactions of an account, driving with WebDriver</li>
+	</ul>
+	</li>
+	<li>feedback 17.15-17.30</li>
+</ul>
+
+
+
+
+<h3>Get in Touch</h3>
+
+<p>If you have any questions or comments, don't hesitate to contact us at firstname dot lastname at ri dot fi!</p>
+
+<p>&#45; Markus Hjort, Timo Rantalaiho, Marko Sibakov</p>
+
+<p/>
+</div>	
+</div>
+</div>	
+    <div class="footer">
+        <div>Copyright &copy; 2009 Markus Hjort, Timo Rantalaiho and Marko Sibakov</div>
+	<div>Designed By <a href="http://www.christinachun.com" title="Christina Chun - Digital Artist &amp; Web Developer">Christina Chun</a> &copy; 2006  </div>
+    </div>
+</body>
+</html>

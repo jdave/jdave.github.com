@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+<meta name="Description" content="Behavior driven development (BDD) framework for Java" />
+<meta name="Keywords" content="bdd, behaviour driven development, behavior driven development, tdd, test driven design" />
+<meta name="Copyright" content="Christina Chun" />
+<meta name="Designed By" content="ChristinaChun.com" />
+<meta name="Language" content="English" />
+<title>JDave</title>
+
+<style type="text/css" title="layout" media="screen"> @import url("gg.css"); </style>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+_uacct = "UA-832056-1";
+_udn="none";
+_ulink=1; 
+urchinTracker();
+</script>
+</head>
+
+<body>
+<div id="container">
+	<div id="header"><div class="headerText">JDave</div>
+	<div class="center"><b class="menu"><a href="index.html">About</a> | 
+	<a href="examples.html">Examples</a> | <a href="usage.html">Usage</a> | 
+	<a href="documentation.html">Documentation</a> |
+	<a href="modules.html">Modules</a> |
+	<a href="screenshots.html">Screenshots</a> |
+	<a href="resources.html">Resources</a></b></div>
+	</div>
+		<div id="content">
+			<div id="bodytext">
+		<h1 class="title">Usage</h1>
+		<div></div>
+
+<h2>Installation</h2>
+To use the framework you need following jars in the CLASSPATH.
+<ul>
+  <li><a href="http://www.laughingpanda.org/maven2/org/jdave/jdave-core/1.1/jdave-core-1.1.jar">jdave-core.jar</a></li>
+  <li><a href="http://www.laughingpanda.org/maven2/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1.jar">jdave-junit4.jar</a></li>
+  <li><a href="http://mirrors.ibiblio.org/pub/mirrors/maven2/junit/junit-dep/4.4/junit-dep-4.4.jar">junit4.jar</a></li>
+  <li><a href="http://www.jmock.org/dist/jmock-2.4.0-jars.zip">jmock + hamcrest + objenesis jars</a></li>
+  <li><a href="http://mirrors.ibiblio.org/pub/mirrors/maven2/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3.jar">cglib-nodep.jar</a></li>
+</ul>
+
+Maven 2 users can get all these dependencies by adding following snippet to pom.xml.
+
+<pre>
+
+  &lt;repositories&gt;
+    &lt;repository&gt;
+      &lt;id&gt;laughing-panda&lt;/id&gt;
+      &lt;name&gt;Laughing Panda&lt;/name&gt;
+      &lt;url&gt;http://www.laughingpanda.org/maven2/&lt;/url&gt;
+    &lt;/repository&gt;
+  &lt;/repositories&gt;
+  
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.jdave&lt;/groupId&gt;
+      &lt;artifactId&gt;jdave-junit4&lt;/artifactId&gt;
+      &lt;version&gt;1.1&lt;/version&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;version&gt;4.4&lt;/version&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+
+</pre>
+
+
+<h2>Creating a specification</h2>
+
+Create specifications. Please see <a href="documentation.html">the documentation</a> for 
+details. <a href="examples.html">A set of examples</a> illustrate currently available features.
+
+<h2>Creating a runner to launch specifications</h2>
+
+Specifications can be launched using JUnit 4 adapter.
+
+JUnit 4 runners can be used by annotating the specification with @RunWith annotation.
+
+<pre>
+@RunWith(JDaveRunner.class)
+public class StackSpec extends Specification&lt;Stack&lt;?&gt;&gt; {
+}
+</pre>
+
+<h2>Example Maven 2 POM</h2>
+
+Copy <a href="pom.xml">pom.xml</a> to a directory named <code>jdave-evaluation</code>.
+Create dirs <code>jdave-evaluation/src/main/java</code> and <code>jdave-evaluation/src/test/java</code>.
+Then run:
+<blockquote>
+<code>mvn eclipse:eclipse</code> (or <code>mvn idea:idea</code>, etc.)
+</blockquote>
+to create Eclipse metafiles and to download required libs. Specifications can be created to 
+<code>src/test/java</code> directory (name them as *Spec.java) and run as:
+<blockquote>
+<code>mvn test</code>
+</blockquote>
+Coverage can be checked for instance with Cobertura.
+<blockquote>
+<code>mvn clean site</code>
+</blockquote>
+generates Cobertura report at <code>jdave-evaluation/target/site/cobertura/index.html</code>.
+
+</div>	
+</div>
+</div>	
+    <div class="footer">
+        <div>Copyright &copy; 2007 JDave developers</div>
+	<div>Designed By <a href="http://www.christinachun.com" title="Christina Chun - Digital Artist &amp; Web Developer">Christina Chun</a> &copy; 2006  </div>
+    </div>
+</body>
+</html>

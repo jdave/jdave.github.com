@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+<meta name="Description" content="Behavior driven development (BDD) framework for Java" />
+<meta name="Keywords" content="bdd, behaviour driven development, behavior driven development, tdd, test driven design" />
+<meta name="Copyright" content="Christina Chun" />
+<meta name="Designed By" content="ChristinaChun.com" />
+<meta name="Language" content="English" />
+<title>JDave</title>
+
+<style type="text/css" title="layout" media="screen"> @import url("gg.css"); </style>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+_uacct = "UA-832056-1";
+_udn="none";
+_ulink=1; 
+urchinTracker();
+</script>
+</head>
+
+<body>
+<div id="container">
+	<div id="header"><div class="headerText">JDave</div>
+	<div class="center"><b class="menu"><a href="index.html">About</a> | 
+	<a href="examples.html">Examples</a> | <a href="usage.html">Usage</a> | 
+	<a href="documentation.html">Documentation</a> |
+	<a href="modules.html">Modules</a> |
+	<a href="screenshots.html">Screenshots</a> |
+	<a href="resources.html">Resources</a></b></div>
+	</div>
+		<div id="content">
+			<div id="bodytext">
+		<h1 class="title">BDD framework for Java</h1>
+		<div class="imageobject"></div>
+<p>
+<a href="http://behaviour-driven.org">Behavior Driven Development</a> (BDD) is a refinement 
+for Test Driven Development (TDD). It is not a radical change from TDD, in fact the actual 
+process of doing BDD is exactly same as in TDD. The vocabulary is just different. While it is 
+possible to practice BDD with any unit testing tool, it is believed that this change 
+should be reflected in used tools too. 
+</p>
+<p>
+JDave is a BDD framework for Java. It is inspired by 
+<a href="http://rspec.rubyforge.org">rspec</a> and integrates 
+<a href="http://www.jmock.org">JMock 2</a> as mocking framework and 
+<a href="http://code.google.com/p/hamcrest/">Hamcrest</a> as matching library. 
+It uses JUnit adapter to launch JDave specifications. This way it is possible to have IDE, build tool 
+and coverage tool support from day one.
+</p>
+<p/>
+News:<br/>
+<ul>
+  <li>Mar 24 2009, <a href="http://www.jdave.org/bdd-wicket/">JDave Wicket session</a> at the ApacheCon EU 2009</li>
+</ul>
+<ul>
+  <li><b>Dec 1 2008, version 1.1 released</b> (same as 1.1-rc3)</li>
+</ul>
+<ul>
+  <li>Oct 13 2008, version 1.1-rc3 released</li>
+    - <a href="https://www.laughingpanda.org/jira/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=10092">issues...</a><br>
+</ul>
+<ul>
+  <li>Oct 12 2008, version 1.1-rc2 released</li>
+    - <a href="https://www.laughingpanda.org/jira/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=10091">issues...</a><br>
+</ul>
+<ul>
+  <li>Jul 6 2008, version 1.1-rc1 released</li>
+    - Improved Scala support (<a href="https://svn.laughingpanda.org/svn/jdave/trunk/jdave-scala/src/scala/jdave/scala/MockSupport.scala">better JMock syntax</a>, <a href="https://svn.laughingpanda.org/svn/jdave/trunk/jdave-scala/src/test/jdave/scala/AdditionSpec.scala">integrated ScalaCheck</a>)<br>
+    - Improved jdave-wicket-selenium module<br>
+    - <a href="https://www.laughingpanda.org/jira/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=10090">issues...</a><br>
+</ul>
+<ul>
+  <li><b>Feb 18 2008, version 1.0 released</b></li>
+</ul>
+<ul>
+  <li>Nov 20 2007, version 1.0-rc1 released</li>
+    - <a href="documentation.html#containments">Containment support for java.util.Map</a><br>
+    - <a href="documentation.html#mocking">Mocking support for final classes/methods</a>, see also <a href="http://blog.miau.biz/2007/09/unfinalizing-in-jdave.html">unfinalizing in jdave</a><br>
+    - <a href="documentation.html#mocking">Mocking support to create dummies</a><br>
+    - <a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-wicket/src/test/jdave/wicket/PageWithItemsSpec.java">Wicket components can be selected using selectFirst(...).which(...).from(...) (or selectAll)</a><br>
+    - JMock 2.4, Hamcrest 1.1 and JUnit 4.4<br>
+    - <a href="documentation.html#basics">'must' can be used instead of 'should' or 'does'</a><br>
+    - <a href="modules.html">Wicket Selenium module</a> for Wicket development<br>
+    - <a href="modules.html">Scala as less verbose syntax</a>, see <a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-scala/src/test/jdave/scala/StackSpec.scala">StackSpec.scala</a><br>
+    - Better IDE support for String comparisons<br>
+    - <a href="http://www.laughingpanda.org/jira/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=10056">issues...</a><br>
+</ul>
+<ul>
+  <li>Jul 02 2007, version 0.9.0 released</li>
+    - <a href="documentation.html#grouping">Specification grouping</a><br>
+    - <a href="modules.html">Wicket module</a> for Wicket development<br>
+    - <a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/HamcrestSampleSpec.java">Hamcrest matchers</a> can be used to set expectations for elements of collections<br>
+    - <a href="documentation.html#reporting">Maven reporting plugin</a><br>
+    - upgraded to <a href="http://www.jmock.org">JMock 2.1</a><br>
+    - maven groupId is changed to be <b>org.jdave</b><br>
+    - opened <a href="http://www.laughingpanda.org/mailman/listinfo/jdave-user">mailing list</a><br>
+    - <a href="http://www.laughingpanda.org/jira/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=10055">issues...</a><br>
+</ul>
+<ul>
+  <li><a href="changes.html">All changes</a></li>
+</ul>
+</div>	
+</div>
+</div>	
+    <div class="footer">
+        <div>Copyright &copy; 2007 JDave developers</div>
+	<div>Designed By <a href="http://www.christinachun.com" title="Christina Chun - Digital Artist &amp; Web Developer">Christina Chun</a> &copy; 2006  </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+<meta name="Description" content="Behavior driven development (BDD) framework for Java" />
+<meta name="Keywords" content="bdd, behaviour driven development, behavior driven development, tdd, test driven design" />
+<meta name="Copyright" content="Christina Chun" />
+<meta name="Designed By" content="ChristinaChun.com" />
+<meta name="Language" content="English" />
+<title>JDave</title>
+
+<style type="text/css" title="layout" media="screen"> @import url("gg.css"); </style>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+_uacct = "UA-832056-1";
+_udn="none";
+_ulink=1; 
+urchinTracker();
+</script>
+</head>
+
+<body>
+<div id="container">
+	<div id="header"><div class="headerText">JDave</div>
+	<div class="center"><b class="menu"><a href="index.html">About</a> | 
+	<a href="examples.html">Examples</a> | <a href="usage.html">Usage</a> | 
+	<a href="documentation.html">Documentation</a> |
+	<a href="modules.html">Modules</a> |
+	<a href="screenshots.html">Screenshots</a> |
+	<a href="resources.html">Resources</a></b></div>
+	</div>
+		<div id="content">
+			<div id="bodytext">
+		<h1 class="title">Documentation</h1>
+		<div></div>
+
+<h2>Intro</h2>
+
+JDave is a framework which provides an easy way to specify behavior of your classes. 
+Key concepts are <b>specification</b>, which is a container for <b>behaviors</b>.
+Behaviors define the behavior of a class and they are always expressed within 
+some <b>context</b>. Context defines the setting where particular behavior applies.
+<p>
+For example, we could specify a <code>Stack</code> by first identifying that it has
+(at least) three interesting states, an empty stack, a full stack and a stack which
+is neither empty nor full. We would then continue by specifying the behavior of
+a <code>Stack</code> when it is in these states. The behavior can then be expressed as:
+<p>
+<blockquote>
+<pre>
+Stack specification
+    Empty stack
+        - is empty
+        - is no longer empty after push
+        - ...
+    Full stack
+        - is full
+        - complains on push
+        - contains all items
+        - ...
+    Stack which is neither empty nor full
+        - adds to the top when pushing new item
+        - ...
+</pre>
+</blockquote>
+
+<a name="basics"></a>
+<h2>Basics</h2>
+
+A specification is implemented by extending <code>jdave.Specification</code> base class.
+It is parametrized by the type of object which is created in contexts. Contexts are
+implemented as public non-static inner classes in the specification class. They do not
+have to extend any base class or implement any interface. Context can optionally have a public
+method <code>create()</code> which either returns a context object or is void. If <code>create()</code>
+methods returns something, it is bound to variables <code>context</code> and <code>be</code>.
+Context can also optionally have a public void method <code>destroy()</code>.
+All other public methods in context class are behaviors.
+
+<pre>
+<code>
+public class StackSpec extends Specification&lt;Stack&lt;?&gt;&gt; {
+    public class EmptyStack {
+        private Stack&lt;String&gt; stack;
+
+        public Stack&lt;String&gt; create() {
+            return stack = new Stack&lt;String&gt;();
+        }
+
+        public void someBehavior() {
+            // ...
+        }
+    }
+}
+</code>
+</pre>
+
+Behaviors are written by doing something to the context object and
+then specifying some expectations. The expectations are specified using one or
+more overloaded <code>specify(..., ...)</code> methods.
+
+<pre>
+<code>
+public class StackSpec extends Specification&lt;Stack&lt;?&gt;&gt; {
+    public class EmptyStack {
+        // ...
+
+        public void isNoLongerEmptyAfterPush() {
+            stack.push("anything");
+            specify(stack, must.not().be.empty());
+        }
+    }
+}
+</code>
+</pre>
+
+Specification base class provides a limited vocabulary to be used for writing
+expectations. In the above example <b><i>must</i></b> is a supplemental word (*) which
+does nothing. It is used to make expectation more readable. <b><i>not()</i></b> triggers
+following expectations to be negations. <b><i>be</i></b> refers to the object
+which was returned from <code>create()</code> method (be == create()).
+<p>
+
+(*) <b><i>does</i></b> and <b><i>should</i></b> can be used too, so these are equivalent:
+<pre>
+<code>
+specify(something, should.equal(...));
+specify(something, does.equal(...));
+specify(something, must.equal(...));
+</code>
+</pre>
+
+
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/StackSpec.java">[examples]</a>
+</p>
+
+<h2>Expectations</h2>
+
+Expectations are set using <code>specify(..., ...)</code> method.
+
+<ul>
+  <li><b>Basic:</b></li>
+<pre><code>
+specify(actual.getAge(), must.equal(20));
+specify(actual, must.be.empty());
+</code></pre>
+  <li><b>Collection, array, iterator:</b></li>
+<pre><code>
+specify(actual, containsInOrder(1, 2, 3));
+specify(actual, containsExactly(1, 2, 3));
+</code></pre>
+  <li><b>Exception:</b></li>
+<pre><code>
+specify(new Block() {}, must.not().raise(SomeException.class));
+specify(new Block() {}, must.raise(SomeException.class, "message"));
+specify(new Block() {}, must.raiseExactly(SomeException.class));
+specify(new Block() {}, must.not().raiseAnyException());
+</code></pre>
+  <li><b>Contract:</b></li>
+<pre><code>
+specify(actual, satisfies(new SerializableContract()));
+specify(actual, does.not().satisfy(new CloneableContract()));
+</code></pre>
+  <li><b>Hamcrest:</b></li>
+<pre><code>
+import static org.hamcrest.Matchers.*;
+specify(person.getAge(), is(greaterThan(30)));
+
+// Using a shared matcher for all collection elements:
+specify(persons, where(
+  new Each&lt;Person&gt;() {{ matches(item.getSurname(), is("Doe")); }}));
+specify(persons, where(
+  new Each&lt;Person&gt;() {{ matches(item.getAge(), is(greaterThan(30))); }}));
+specify(persons, where(
+  new Each&lt;Person&gt;() {{ matches(item, instanceOf(Person.class)); }}));
+
+// Using individual matcher for each collection element, fails if
+// number of matchers do not equal with number of elements:
+specify(persons, where(
+  new Each&lt;Person&gt;() {{ matches(item.getAge(), is(35), is(31)); }}));
+
+</code></pre>
+</ul>
+
+<h2>Lifecycle</h2>
+
+A new <code>Specification</code> and context instance is created before executing
+each behavior. <code>destroy()</code> method is executed just after each behavior
+method.
+
+<ol>
+<li> spec = new SomeSpecification();</li>
+<li> spec.create();</li>
+<li> ctx = spec.new SomeContext();</li>
+<li> be = ctx.create();</li> // if exists</li>
+<li> <i>[run some behavior]</i></li>
+<li> ctx.destroy(); // if exists</li>
+<li> spec.destroy();</li>
+<li> skip to 1. if there's more behaviors to be run</li>
+</ol>
+
+It is possible to register a <code>ILifecycleListener</code> in a specification to get 
+notifications about lifecycle events.
+
+<a name="containments"></a>
+<h2>Containments</h2>
+
+Specification class provides expectation methods to compare various collection classes
+and their friends. 
+<ul>
+  <li><code>containsAll, does.not().containAll</code></li>
+  The actual collection must contain all given elements. The order of elements
+  is not significant.
+  <li><code>containsAny, does.not().containAny</code></li>
+  The actual collection must contain at least one element from given collection.
+  <li><code>containsExactly, does.not().containExactly</code></li>
+  The actual collection must contain exactly the same elements as in given collection. 
+  The order of elements is not significant.
+  <li><code>containsInOrder, does.not().containInOrder</code></li>
+  The actual collection must contain exactly the same elements as in given collection
+  and in same order.
+  <li><code>containsInPartialOrder, does.not().containInPartialOrder</code></li>
+  The actual collection can hold other objects, but the objects which are common in
+  both collections must be in same order. The actual collection can also repeat
+  some elements. Example, [1, 2, 2, 3, 4] is in partial order with [1, 2, 3].
+  See <a href="http://en.wikipedia.org/wiki/Partial_order">Wikipedia</a> for
+  further information.
+</ul>
+
+Containments can be done for arrays, Collections, Iterators and Iterables.
+
+<pre>
+<code>
+specify(Arrays.asList(0, 1, 2), containsAll(Arrays.asList(0, 1)));
+specify(Arrays.asList(1, 2).iterator(), containsAny(0, 1));
+specify(new Object[] { 1, 2 }, does.not().containAny(0, -1)));
+specify(new MyIterable(1, 2), containsExactly(2, 1)));
+specify(new MyIterable(1, 2), containsInOrder(1, 2)));
+specify(Arrays.asList(1, 2, 3), containsInPartialOrder(1, 2)));
+etc.
+</code>
+</pre>
+
+Application specific containments can be done by implementing <code>jdave.IContainment</code> interface.
+<p>
+Map containments can be specified using <code>maps(key1, key2, ...).to(value1, value2, ...)</code> construct:
+<pre>
+<code>
+Map&lt;Integer, String&gt; actual = Maps.map(1, "foo").map(2, "bar"); 
+specify(actual, maps(1, 2).to("foo", "bar"));
+</code>
+</pre>
+
+
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/ContainmentSampleSpec.java">[examples]</a>
+</p>
+
+<h2>Contract enforcements</h2>
+
+Some core Java classes impose (or recommend) contracts for classes which implement
+some interface or override a method. Probably most common is the contract between
+<code>equals()</code> and <code>hashCode()</code>. The following contract enforcements
+are provided.
+
+<ul>
+  <li><code>EqualsHashCodeContract</code></li>
+  <li><code>SerializableContract</code></li>
+  <li><code>CloneableContract</code></li>
+  <li><code>EqualsComparableContract</code></li>  
+</ul>
+
+Contract is specified using <code>satisfies</code> method. 
+<code>should.not().satisfy</code> can be used if an object should not satisfy
+a contract.
+
+<pre>
+<code>
+public void isSerializable() {
+    specify(serializable, satisfies(new SerializableContract()));
+}
+
+public void isNotSerializable() {
+    specify(nonSerializable, should.not().satisfy(new SerializableContract()));
+}
+</code>
+</pre>
+
+Application specific contracts can be done by implementing <code>jdave.IContract</code>
+interface.
+
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/ContractEnforcementSampleSpec.java">[examples]</a>
+</p>
+
+<a name="mocking"></a>
+<h2>Using mocks</h2>
+
+JMock 2 is integrated as mocking framework. Please refer to <a href="http://www.jmock.org">JMock documentation</a>.
+<p>
+Mocks are created with <code>mock</code> method and all mocks are automatically verified after the behaviour method
+execution. Dummies can be created with <code>dummy</code> method. Dummy is a mock whose all methods are ignored.
+<p>
+JMock <code>Mockery</code> instance can be accessed using specification field <code>mockery</code>.
+By default, JDave uses imposteriser which allows mocking of concrete classes. This default can
+be changed with <code>mockery.setImposteriser</code> method.
+</p>
+<p>The final keyword protects classes and methods from being overridden.  Sometimes you want to mock a class or a method that has been declared final in a 3rd party library.
+this is not what final should be protecting against, so jdave-unfinalizer removes these restrictions on mocking.
+</p>
+<p>
+To load jdave-unfinalizer, and thereby unfinalize classes not in the boot classloader, launch your tests with the following vm parameter:
+</p>
+<p>
+-javaagent:/path/to/workspace/jdave-unfinalizer/target/jdave-unfinalizer-jar-name.jar
+</p>
+<p>
+UnfinalizerAcceptanceSpec demonstrates the mocking of a final class and a final method, both previously impossible.
+</p>
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/ObservableSpec.java">[examples]</a>
+</p>
+
+<h2>Extending default vocabulary</h2>
+
+Extending the default vocabulary is done by overriding fields <b><i>should</i></b>, <b><i>must</i></b> and <b><i>does</i></b>.
+Then adding new <code>specify(...)</code> and factory methods which provide the extension. Negation
+can be extended by overriding <code>not()</code> method. 
+<p>
+Let's go through an example which adds following extension to the vocabulary:
+<pre>
+<code>
+specify(a, should.approximate(b));
+</code>
+</pre>
+
+A possible implementation could be done by extending base <code>Specification</code> and encapsulating
+the extension there. (Note, the extension can also be done as static methods if inheritance is too cumbersome.
+The methods can then be statically imported to specification which needs them.)
+<pre>
+<code>
+public abstract class ExtendedSpecification&lt;T&gt; extends Specification&lt;T&gt; {
+    protected ExtendedSpecification&lt;T&gt; should = this;
+    protected ExtendedSpecification&lt;T&gt; does = this;
+    protected ExtendedSpecification&lt;T&gt; must = this;
+    
+    public void specify(double actual, Approximation approximation) {
+        approximation.approximate(actual);
+    }
+        
+    public Approximation approximate(double expected) {
+        return new Approximation(expected);
+    }
+}
+
+class Approximation {
+    private final double expected;
+
+    Approximation(double expected) {
+        this.expected = expected;        
+    }
+    
+    public void approximate(double actual) {
+        if (Math.abs(actual - expected) &gt; 0.01) {
+            throw new ExpectationFailedException(actual + 
+                " is not an approximation of " + expected);
+        }
+    }
+}
+</code>
+</pre>
+
+To use the extension simply extend the specification from <code>ExtendedSpecification</code>.
+See a complete example which supports <code>not()</code> too below:
+
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/ExtendedSpecification.java">[extension]</a><br>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-examples/src/test/jdave/examples/ApproximationSampleSpec.java">[usage of extension]</a>
+</p>
+
+<h2>Injecting values into fields</h2>
+
+InjectionSupport can be used to inject values into specification (or any other object) 
+fields. This is often used for instance to inject Spring managed beans into specification.
+
+<p>
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-core/src/java/jdave/injection/InjectionSupport.java">[examples]</a>
+</p>
+
+<h2>Thread local isolation</h2>
+
+Some contexts set thread local variables. This may cause following behaviors to fail if 
+they depend on initial thread local state. Thread locals can be isolated for all behavior 
+methods of current specification by overriding the method 
+<code>Specification.needsThreadLocalIsolation()</code> and returning true. Then a fresh new thread 
+is created for all methods in the specification.
+
+<a name="grouping"></a>
+<h2>Grouping</h2>
+
+Specifications can be grouped by tagging them with @Group annotation. The annotation takes
+an array of group names as an argument:
+
+<pre>
+<code>
+@Group({ "slow", "database" })
+public class MySpecification extends Specification&lt;Foo&gt; {
+}
+</code>
+</pre>
+
+The tagged specifications can then be run with suite runners:
+<pre>
+<code>
+@RunWith(JDaveGroupRunner.class)
+@Groups(include={ "slow" })
+public class SuiteForSlowSpecs {
+}
+
+@RunWith(JDaveGroupRunner.class)
+@Groups(include={ Groups.ALL }, exclude={ "slow" })
+public class SuiteForNonSlowSpecs {
+}
+</code>
+</pre>
+
+<a name="reporting"></a>
+<h2>Reporting</h2>
+
+Report generation can be activated by setting system property <code>jdave.tools.specdox.format</code>.
+Possible values are <code>txt</code> or <code>xml</code>. Use a space limited list to generate dox in
+multiple formats simultaneously. The target directory is configured by
+setting system property <code>jdave.tools.specdox.dir</code> (default is target/jdave). 
+Sample report generated with <code>txt</code> format:
+
+<blockquote>
+<pre>
+StackSpec:
+
+Empty stack
+  - is empty
+  - is no longer empty after push
+
+Full stack
+  - is full
+  - complains on push
+  - contains all items
+  
+Stack which is neither empty nor full
+  - adds to the top when sent push
+</pre>  
+</blockquote>
+
+<p>
+Generated XML files can be converted to HTML report using XSL styleheet. Install 
+<a href="http://saxon.sourceforge.net">Saxon 8</a>
+(or some other XSLT 2.0 compliant processor). Then download
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-core/src/scripts/specdox.xsl">specdox.xsl</a> and
+<a href="http://svn.laughingpanda.org/svn/jdave/trunk/jdave-core/src/scripts/dox2html.sh">dox2html.sh</a>
+to a same directory. Process styleseet by running the script:
+<blockquote>
+<code>dox2html.sh [/path/to/spec/xml/dir/]</code>
+</blockquote>
+
+Sample HTML report:
+<iframe src="specdox-sample/index.html" height="200" width="100%"></iframe>
+
+<p>
+Specdox can be generated using a maven plugin too (note, it is required to activate specdox
+generation to generate xml format  <code>jdave.tools.specdox.format=xml</code>). The generated HTML 
+will be added to maven reports when generating the site with 'mvn site'. The generated docs will have 
+source xrefs if used with maven-jxr-plugin:
+
+<blockquote>
+<pre>
+    &lt;plugins&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.jdave&lt;/groupId&gt;
+        &lt;artifactId&gt;jdave-report-plugin&lt;/artifactId&gt;
+      &lt;/plugin&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-jxr-plugin&lt;/artifactId&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+</pre>  
+</blockquote>
+
+<p>
+See a sample <a href="pom.xml">pom.xml</a> for how to configure specdox as part of a maven build.
+</p>
+
+<h2>API</h2>
+
+<a href="api/">Javadoc</a>
+
+</div>	
+</div>
+</div>	
+    <div class="footer">
+        <div>Copyright &copy; 2007 JDave developers</div>
+	<div>Designed By <a href="http://www.christinachun.com" title="Christina Chun - Digital Artist &amp; Web Developer">Christina Chun</a> &copy; 2006  </div>
+    </div>
+</body>
+</html>
